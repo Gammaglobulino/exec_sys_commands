@@ -10,8 +10,19 @@ import (
 	"testing"
 )
 
-func TestExecuteSystemCommand(t *testing.T) {
+func TestExecuteSystemCommandWithFunc(t *testing.T) {
 	out, err := ExecuteSystemCommand("ip", []string{"address"})
+	if err != nil {
+		fmt.Println(err)
+		t.Fail()
+	}
+	fmt.Println(strings.Split(out, " ")[2:3])
+	assert.EqualValues(t, "<LOOPBACK,UP,LOWER_UP>", strings.Split(out, " ")[2:3][0])
+	fmt.Println(out)
+}
+func TestExecuteSystemCommandWithStruct(t *testing.T) {
+	cmd := NewIPCommand().AddArgument("address")
+	out, err := cmd.Execute()
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()

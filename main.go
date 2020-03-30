@@ -27,7 +27,7 @@ func (c *Command) AddArgument(arg string) *Command {
 	c.args = append(c.args, arg)
 	return c
 }
-func NewIPCommand(n string) *Command {
+func NewIPCommand() *Command {
 	c := Command{
 		name:   "sudo",
 		inFace: "",
