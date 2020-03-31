@@ -16,7 +16,7 @@ type Command struct {
 
 func (c *Command) Execute() (string, error) {
 	cmd := exec.Command(c.name, c.args...)
-	out, err := cmd.Output()
+	out,err := cmd.Output()
 	if err != nil {
 		return "", err
 	}

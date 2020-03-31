@@ -44,6 +44,11 @@ func TestExecuteSystemCommandQueryInterface(t *testing.T) {
 	fmt.Println(out)
 
 }
+func TestExecuteSystemCommandWrongArg(t *testing.T) {
+	cmd := NewIPCommand().AddArgument("wrong")
+	_, err := cmd.Execute()
+	assert.NotNil(t,err,"Wrong argument")
+}
 
 func TestExecuteSystemCommandInterfaceOff(t *testing.T) {
 	//ip link set eth0 down
