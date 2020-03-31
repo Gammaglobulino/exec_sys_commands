@@ -11,86 +11,88 @@ type Command interface {
 	Execute()
 }
 
-type PortScanner struct{
-	baseDNS string
-	portStart int
-	portEnd int
-	succeededScans []string
-	timeout time.Duration
+type PortScanner struct {
+	BaseDNS        string
+	PortStart      int
+	PortEnd        int
+	SucceededScans []string
+	Timeout        time.Duration
 }
 
-func NewScanner(bDNs string,start int, end int) *PortScanner{
+func NewScanner(bDNs string, start int, end int) *PortScanner {
 	return &PortScanner{
-		baseDNS:        bDNs,
-		portStart:      start,
-		portEnd:        end,
-		timeout:time.Second,
+		BaseDNS:   bDNs,
+		PortStart: start,
+		PortEnd:   end,
+		Timeout:   time.Second,
 	}
 
 }
-func (ps *PortScanner) newPortRange(start int, end int){
-	ps.portStart=start
-	ps.portEnd=end
+func (ps *PortScanner) newPortRange(start int, end int) {
+	ps.PortStart = start
+	ps.PortEnd = end
 }
 
-func (ps *PortScanner) newDNS(dns string){
-	ps.baseDNS=dns
+func (ps *PortScanner) newDNS(dns string) {
+	ps.BaseDNS = dns
 }
 
 // using decorator to extend the PortScanner adding async scan
-type AsyncPortScanner struct{
+type AsyncPortScanner struct {
 	PortScanner
 }
 
-func NewAsyncScanner(bDNs string,start int, end int) *AsyncPortScanner{
+func NewAsyncScanner(bDNs string, start int, end int) *AsyncPortScanner {
 	return &AsyncPortScanner{
-		PortScanner{baseDNS: bDNs,
-			portStart: start,
-			portEnd:   end,
-			timeout:   time.Second,
+		PortScanner{BaseDNS: bDNs,
+			PortStart: start,
+			PortEnd:   end,
+			Timeout:   time.Second,
 		},
 	}
 }
 
-func (aps *AsyncPortScanner) Execute(){
+func (aps *AsyncPortScanner) Execute() {
 	var wg sync.WaitGroup
-	for i:=aps.portStart;i<=aps.portEnd;i++ {
+
+	for i := aps.PortStart; i <= aps.PortEnd; i++ {
 		wg.Add(1)
-		go func(){
-			defer wg.Done()
-			addr := fmt.Sprintf(aps.baseDNS+":%d", i)
+		fmt.Println(i)
+		go func(group *sync.WaitGroup) {
+			defer group.Done()
+			addr := fmt.Sprintf(aps.BaseDNS+":%d", i)
 			//TODO remove that log
 			fmt.Println(addr)
-			conn, err := net.DialTimeout("tcp", addr,aps.timeout)
+			conn, err := net.DialTimeout("tcp", addr, aps.Timeout)
 			if err != nil {
 				return
 			}
-			aps.succeededScans=append(aps.succeededScans,addr)
+			aps.SucceededScans = append(aps.SucceededScans, addr)
 			conn.Close()
-		}()
+		}(&wg)
 	}
 	wg.Wait()
 
 }
 
 func (ps *PortScanner) Execute() {
-	for i:=ps.portStart;i<=ps.portEnd;i++ {
-		addr := fmt.Sprintf(ps.baseDNS+":%d", i)
+	for i := ps.PortStart; i <= ps.PortEnd; i++ {
+		addr := fmt.Sprintf(ps.BaseDNS+":%d", i)
 		//TODO remove that log
 		fmt.Println(addr)
-		conn, err := net.DialTimeout("tcp", addr,ps.timeout)
+		conn, err := net.DialTimeout("tcp", addr, ps.Timeout)
 		if err != nil {
 			continue
 		}
-		ps.succeededScans=append(ps.succeededScans,addr)
+		ps.SucceededScans = append(ps.SucceededScans, addr)
 		conn.Close()
 	}
 }
 
-const(
-	IP_ADDR="scanner.nmap.org"
+const (
+	IP_ADDR = "scanner.nmap.org"
 )
 
-func main(){
+func main() {
 
 }
