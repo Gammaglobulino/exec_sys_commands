@@ -12,6 +12,7 @@ type Command interface {
 }
 
 type PortScanner struct {
+	sync.Mutex
 	BaseDNS        string
 	PortStart      int
 	PortEnd        int
@@ -58,18 +59,21 @@ func (aps *AsyncPortScanner) Execute() {
 	for i := aps.PortStart; i <= aps.PortEnd; i++ {
 		wg.Add(1)
 		fmt.Println(i)
-		go func(group *sync.WaitGroup) {
+		go func(group *sync.WaitGroup, port int) {
 			defer group.Done()
-			addr := fmt.Sprintf(aps.BaseDNS+":%d", i)
+			addr := fmt.Sprintf(aps.BaseDNS+":%d", port)
 			//TODO remove that log
 			fmt.Println(addr)
 			conn, err := net.DialTimeout("tcp", addr, aps.Timeout)
 			if err != nil {
 				return
 			}
+			aps.Lock()
 			aps.SucceededScans = append(aps.SucceededScans, addr)
+			aps.Unlock()
+
 			conn.Close()
-		}(&wg)
+		}(&wg, i)
 	}
 	wg.Wait()
 
