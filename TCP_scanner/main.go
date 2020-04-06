@@ -43,6 +43,11 @@ type AsyncPortScanner struct {
 	PortScanner
 }
 
+type AsyncChanPortScanner struct {
+	totalTimeout time.Duration
+	AsyncPortScanner
+}
+
 func NewAsyncScanner(bDNs string, start int, end int) *AsyncPortScanner {
 	return &AsyncPortScanner{
 		PortScanner{BaseDNS: bDNs,
@@ -50,6 +55,42 @@ func NewAsyncScanner(bDNs string, start int, end int) *AsyncPortScanner {
 			PortEnd:   end,
 			Timeout:   time.Second,
 		},
+	}
+}
+
+func NewAsyncChanScanner(bDNs string, start int, end int) *AsyncChanPortScanner {
+	return &AsyncChanPortScanner{
+		time.Second,
+		AsyncPortScanner{PortScanner{BaseDNS: bDNs,
+			PortStart: start,
+			PortEnd:   end,
+			Timeout:   time.Second,
+		},
+		},
+	}
+}
+
+func (aps *AsyncChanPortScanner) Execute() {
+	pchan := make(chan string)
+	for i := aps.PortStart; i <= aps.PortEnd; i++ {
+		fmt.Println(i)
+		go func(ch chan string, port int) {
+			if port == aps.PortEnd {
+				defer close(ch)
+			}
+			addr := fmt.Sprintf(aps.BaseDNS+":%d", port)
+			//TODO remove that log
+			fmt.Println(addr)
+			conn, err := net.DialTimeout("tcp", addr, aps.Timeout)
+			if err != nil {
+				return
+			}
+			ch <- addr
+			conn.Close()
+		}(pchan, i)
+	}
+	for p := range pchan {
+		aps.SucceededScans = append(aps.SucceededScans, p)
 	}
 }
 
@@ -71,7 +112,6 @@ func (aps *AsyncPortScanner) Execute() {
 			aps.Lock()
 			aps.SucceededScans = append(aps.SucceededScans, addr)
 			aps.Unlock()
-
 			conn.Close()
 		}(&wg, i)
 	}

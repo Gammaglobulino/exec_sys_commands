@@ -2,6 +2,7 @@ package main
 
 import (
 	"../TCP_scanner"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -27,5 +28,14 @@ func TestAsyncPortScanner_Execute(t *testing.T) {
 	scanner := main.NewAsyncScanner(main.IP_ADDR, 1, 30)
 	scanner.Execute()
 	assert.EqualValues(t, 2, len(scanner.SucceededScans))
+
+}
+
+func TestAsyncPortScannerWithChan_Execute(t *testing.T) {
+	scanner := main.NewAsyncChanScanner(main.IP_ADDR, 1, 100)
+	fmt.Println(scanner.SucceededScans)
+	scanner.Execute()
+	assert.EqualValues(t, 3, len(scanner.SucceededScans))
+	fmt.Println(scanner.SucceededScans)
 
 }
