@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestLocalIP(t *testing.T) {
+func TestRetrievingLocalIP(t *testing.T) {
 	localip, err := Execute_systems_commands.RetrieveCurrentIP()
 	if err != nil {
 		t.Fail()
