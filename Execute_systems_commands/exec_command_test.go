@@ -65,13 +65,15 @@ func TestRetrieveIPaddr(t *testing.T) {
 		}
 	}
 	IP := ""
-	NextEth0 := outputCommands[index:len(outputCommands)]
+	NextEth0 := outputCommands[index:]
 	fmt.Println(NextEth0)
 	for i, v := range NextEth0 {
 		if v == "inet" {
 			IP = NextEth0[i+1]
 		}
 	}
+	IP = strings.Split(IP, "/")[0]
+
 	assert.NotContains(t, "", IP)
 }
 
