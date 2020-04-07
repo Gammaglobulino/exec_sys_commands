@@ -17,15 +17,12 @@ func TestExecuteSystemCommandWithFunc(t *testing.T) {
 		fmt.Println(err)
 		t.Fail()
 	}
-	fmt.Println(strings.Split(out, " ")[2:3])
 	assert.EqualValues(t, "<LOOPBACK,UP,LOWER_UP>", strings.Split(out, " ")[2:3][0])
-	fmt.Println(out)
 }
 
 func TestCommand_Execute_RetrieveETH0StringIndexinterface(t *testing.T) {
 	out, err := main.ExecuteSystemCommand("ip", []string{"a"})
 	if err != nil {
-		fmt.Println(err)
 		t.Fail()
 	}
 	outputCommands := strings.Split(out, " ")
@@ -42,7 +39,6 @@ func TestCommand_Execute_RetrieveETH0StringIndexinterface(t *testing.T) {
 func TestCommand_Execute_ETH0InterfaceExists(t *testing.T) {
 	err, yes, index := main.InterfaceExists("eth0:")
 	if err != nil {
-		fmt.Println(err)
 		t.Fail()
 	}
 
@@ -53,7 +49,6 @@ func TestCommand_Execute_ETH0InterfaceExists(t *testing.T) {
 func TestRetrieveIPaddr(t *testing.T) {
 	out, err := main.ExecuteSystemCommand("ip", []string{"a"})
 	if err != nil {
-		fmt.Println(err)
 		t.Fail()
 	}
 	outputCommands := strings.Split(out, " ")
@@ -66,14 +61,12 @@ func TestRetrieveIPaddr(t *testing.T) {
 	}
 	IP := ""
 	NextEth0 := outputCommands[index:]
-	fmt.Println(NextEth0)
 	for i, v := range NextEth0 {
 		if v == "inet" {
 			IP = NextEth0[i+1]
 		}
 	}
 	IP = strings.Split(IP, "/")[0]
-
 	assert.NotContains(t, "", IP)
 }
 
@@ -87,24 +80,18 @@ func TestExecuteSystemCommandWithStruct(t *testing.T) {
 	cmd := main.NewIPCommand().AddArgument("address")
 	out, err := cmd.Execute()
 	if err != nil {
-		fmt.Println(err)
 		t.Fail()
 	}
-	fmt.Println(strings.Split(out, " ")[2:3])
 	assert.EqualValues(t, "<LOOPBACK,UP,LOWER_UP>", strings.Split(out, " ")[2:3][0])
-	fmt.Println(out)
 }
 
 func TestExecuteSystemCommandQueryInterface(t *testing.T) {
 	args := []string{"link", "ls", "eth0"}
 	out, err := main.ExecuteSystemCommand("ip", args)
 	if err != nil {
-		fmt.Println(err)
 		t.Fail()
 	}
-	fmt.Println(strings.Split(out, " ")[2:3])
 	assert.EqualValues(t, "<BROADCAST,MULTICAST,UP,LOWER_UP>", strings.Split(out, " ")[2:3][0])
-	fmt.Println(out)
 
 }
 func TestExecuteSystemCommandWrongArg(t *testing.T) {
@@ -118,7 +105,6 @@ func TestExecuteSystemCommandInterfaceOff(t *testing.T) {
 	args := []string{"ip", "link", "set", "eth0", "down"}
 	_, err := main.ExecuteSystemCommand("sudo", args)
 	if err != nil {
-		fmt.Println(err)
 		t.Fail()
 	}
 
@@ -128,7 +114,6 @@ func TestExecuteSystemCommandInterfaceOn(t *testing.T) {
 	args := []string{"ip", "link", "set", "eth0", "up"}
 	_, err := main.ExecuteSystemCommand("sudo", args)
 	if err != nil {
-		fmt.Println(err)
 		t.Fail()
 	}
 }
@@ -141,21 +126,18 @@ func TestExecuteSystemCommandChangingMAC(t *testing.T) {
 	args := []string{"ip", "link", "set", iFace, "down"}
 	_, err := main.ExecuteSystemCommand("sudo", args)
 	if err != nil {
-		fmt.Println(err)
 		t.Fail()
 	}
 
 	args = []string{"ip", "link", "set", "eth0", "address", newMACaddr}
 	_, err = main.ExecuteSystemCommand("sudo", args)
 	if err != nil {
-		fmt.Println(err)
 		t.Fail()
 	}
 
 	args = []string{"ip", "link", "set", iFace, "up"}
 	_, err = main.ExecuteSystemCommand("sudo", args)
 	if err != nil {
-		fmt.Println(err)
 		t.Fail()
 	}
 }

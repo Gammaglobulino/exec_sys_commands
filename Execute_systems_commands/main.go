@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os/exec"
 	"strings"
 )
@@ -80,13 +79,13 @@ func RetrieveCurrentIP() (string, error) {
 		}
 	}
 	IP := ""
-	NextEth0 := outputCommands[index:len(outputCommands)]
-	fmt.Println(NextEth0)
+	NextEth0 := outputCommands[index:]
 	for i, v := range NextEth0 {
 		if v == "inet" {
-			IP = NextEth0[i+1]
+			IP = strings.Split(NextEth0[i+1], "/")[0]
 		}
 	}
+
 	return IP, nil
 
 }
