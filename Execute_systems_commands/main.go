@@ -1,4 +1,4 @@
-package main
+package Execute_systems_commands
 
 import (
 	"os/exec"
@@ -87,9 +87,5 @@ func RetrieveCurrentIP() (string, error) {
 	}
 
 	return IP, nil
-
-}
-
-func main() {
 
 }

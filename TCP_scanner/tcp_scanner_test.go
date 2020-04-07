@@ -3,7 +3,6 @@ package main
 import (
 	"../TCP_scanner"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
@@ -18,16 +17,21 @@ func TestPortScanner_Execute(t *testing.T) {
 */
 func TestPortScannerTimeout(t *testing.T) {
 	scanner := main.NewScanner(main.IP_ADDR, 1, 30)
-	scanner.Timeout = time.Millisecond * 500 // timeout sets to 500 millisec
+	scanner.Timeout = time.Millisecond * 200 // if it fail, consider to rise up the timeout
 	scanner.Execute()
-	assert.EqualValues(t, 2, len(scanner.SucceededScans))
-
+	nports := len(scanner.SucceededScans)
+	if nports != 2 {
+		t.Fatalf("Expected 2 open ports, acutal %d", nports)
+	}
 }
 
 func TestAsyncPortScanner_Execute(t *testing.T) {
 	scanner := main.NewAsyncScanner(main.IP_ADDR, 1, 30)
 	scanner.Execute()
-	assert.EqualValues(t, 2, len(scanner.SucceededScans))
+	nports := len(scanner.SucceededScans)
+	if nports != 2 {
+		t.Fatalf("Expected 2 open ports, acutal %d", nports)
+	}
 
 }
 
@@ -35,7 +39,8 @@ func TestAsyncPortScannerWithChan_Execute(t *testing.T) {
 	scanner := main.NewAsyncChanScanner(main.IP_ADDR, 1, 100)
 	fmt.Println(scanner.SucceededScans)
 	scanner.Execute()
-	assert.EqualValues(t, 3, len(scanner.SucceededScans))
-	fmt.Println(scanner.SucceededScans)
-
+	nports := len(scanner.SucceededScans)
+	if nports != 3 {
+		t.Fatalf("Expected 3 open ports, acutal %d", nports)
+	}
 }

@@ -73,14 +73,11 @@ func NewAsyncChanScanner(bDNs string, start int, end int) *AsyncChanPortScanner 
 func (aps *AsyncChanPortScanner) Execute() {
 	pchan := make(chan string)
 	for i := aps.PortStart; i <= aps.PortEnd; i++ {
-		fmt.Println(i)
 		go func(ch chan string, port int) {
 			if port == aps.PortEnd {
 				defer close(ch)
 			}
 			addr := fmt.Sprintf(aps.BaseDNS+":%d", port)
-			//TODO remove that log
-			fmt.Println(addr)
 			conn, err := net.DialTimeout("tcp", addr, aps.Timeout)
 			if err != nil {
 				return
@@ -98,13 +95,11 @@ func (aps *AsyncPortScanner) Execute() {
 	var wg sync.WaitGroup
 
 	for i := aps.PortStart; i <= aps.PortEnd; i++ {
+
 		wg.Add(1)
-		fmt.Println(i)
 		go func(group *sync.WaitGroup, port int) {
 			defer group.Done()
 			addr := fmt.Sprintf(aps.BaseDNS+":%d", port)
-			//TODO remove that log
-			fmt.Println(addr)
 			conn, err := net.DialTimeout("tcp", addr, aps.Timeout)
 			if err != nil {
 				return
@@ -121,9 +116,8 @@ func (aps *AsyncPortScanner) Execute() {
 
 func (ps *PortScanner) Execute() {
 	for i := ps.PortStart; i <= ps.PortEnd; i++ {
+
 		addr := fmt.Sprintf(ps.BaseDNS+":%d", i)
-		//TODO remove that log
-		fmt.Println(addr)
 		conn, err := net.DialTimeout("tcp", addr, ps.Timeout)
 		if err != nil {
 			continue
