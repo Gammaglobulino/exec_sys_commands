@@ -3,11 +3,12 @@ package handle_connections
 import (
 	"../../../Execute_systems_commands"
 	"../handle_connections"
+	"fmt"
 	"net"
 	"testing"
 )
 
-func TestStartListeningto(t *testing.T) {
+func TestClientServerCommunicationLab(t *testing.T) {
 
 	var clientconn net.Conn
 	var serverconn net.Conn
@@ -22,14 +23,15 @@ func TestStartListeningto(t *testing.T) {
 	localip = localip + handle_connections.Port
 
 	go handle_connections.MultiCoreListeningTo(&conch, &canstart, localip)
-
+	serverClosed := false
 	for {
 		select {
 		case serverconn = <-conch:
 			serverconn.Close()
-			return
-		case startend := <-canstart:
-			if startend {
+			serverClosed = true
+			break
+		case isServerStarted := <-canstart:
+			if isServerStarted {
 				clientconn, err = handle_connections.ConnectTo(localip)
 				if err != nil {
 					t.Fatalf("Connection error %s", err.Error())
@@ -37,8 +39,14 @@ func TestStartListeningto(t *testing.T) {
 				}
 				clientconn.Close()
 			}
-
+			break
+		}
+		if serverClosed {
+			break
 		}
 	}
+
+	//TODO remove
+	fmt.Println("Bye")
 
 }
