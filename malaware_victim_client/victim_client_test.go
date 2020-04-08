@@ -13,5 +13,6 @@ func TestConnectionToServer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Connection error %s", err.Error())
 	}
+	defer connection.Close()
 	fmt.Println(connection.RemoteAddr().String())
 }

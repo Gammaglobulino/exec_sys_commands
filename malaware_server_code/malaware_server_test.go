@@ -38,6 +38,7 @@ func TestStartListeningto(t *testing.T) {
 	for {
 		select {
 		case serverconn = <-conch:
+			serverconn.Close()
 			return
 		case startend := <-canstart:
 			if startend {
@@ -46,6 +47,7 @@ func TestStartListeningto(t *testing.T) {
 					t.Fatalf("Connection error %s", err.Error())
 					return
 				}
+				clientconn.Close()
 			}
 
 		}
