@@ -2,7 +2,6 @@ package malaware_victim_client
 
 import (
 	"fmt"
-	"log"
 	"net"
 )
 
@@ -11,12 +10,17 @@ const (
 	Port     = ":9090"
 )
 
-func main() {
-
+func ConnectTo(ip string) (net.Conn, error) {
 	LocalIPAddr := ServerIP + Port
 	connection, err := net.Dial("tcp", LocalIPAddr)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	fmt.Println(connection.RemoteAddr().String())
+	return connection, nil
+}
+func main() {
+
+	LocalIPAddr := ServerIP + Port
+	ConnectTo(LocalIPAddr)
 }
