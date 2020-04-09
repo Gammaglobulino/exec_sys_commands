@@ -31,8 +31,8 @@ func MultiCoreListeningTo(connectionch *chan net.Conn, canstarttosend *chan bool
 	}
 	fmt.Println("Listening to:", ip)
 	*canstarttosend <- true //client can start to listen
-	connection, err = listener.Accept()
 
+	connection, err = listener.Accept()
 	if err != nil {
 		close(*connectionch)
 		close(*canstarttosend)
@@ -41,4 +41,5 @@ func MultiCoreListeningTo(connectionch *chan net.Conn, canstarttosend *chan bool
 		fmt.Println("Connection established from:" + connection.RemoteAddr().String())
 	}
 	*connectionch <- connection
+
 }
