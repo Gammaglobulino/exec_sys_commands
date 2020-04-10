@@ -1,4 +1,4 @@
-package main
+package net_packet_capturing
 
 import (
 	"fmt"
@@ -9,39 +9,27 @@ import (
 )
 
 var (
-	iface    = "eth0"
-	devFound = false
-	snapLen  = int32(1600)
-	timeout  = pcap.BlockForever
-	filter   = "tcp and port 80"
-	promisc  = false
+	iface    = `\Device\NPF_{74F64D39-4E0C-40D4-B041-B17D82CF0536}`
+	DevFound = false
+	SnapLen  = int32(1600)
+	Timeout  = pcap.BlockForever
+	Filter   = "tcp and port 80"
+	Promisc  = false
 )
 
-func main() {
+func ListenToTCPPackets() {
 
 	// you must have permission to capture packet- try using sudo su
 	//trying entering username and password to http://diptera.myspecies.info/
 
-	devices, err := pcap.FindAllDevs()
-	if err != nil {
-		log.Fatal(err)
-	}
+	for {
 
-	for _, dev := range devices {
-		if dev.Name == iface {
-			devFound = true
-		}
-
-		if !devFound {
-			log.Panicf("No device found for %s \n", iface)
-		}
-
-		handle, err := pcap.OpenLive(iface, snapLen, promisc, timeout)
+		handle, err := pcap.OpenLive(iface, SnapLen, Promisc, Timeout)
 		if err != nil {
 			log.Panic(err)
 		}
 
-		err = handle.SetBPFFilter(filter)
+		err = handle.SetBPFFilter(Filter)
 		if err != nil {
 			log.Panicln(err)
 		}
