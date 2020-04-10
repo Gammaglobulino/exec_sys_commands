@@ -4,7 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"net"
+	"os"
 	"strings"
+)
+
+const (
+	Port = ":9090"
 )
 
 func SingleThreadListeningto(ip string) (net.Conn, error) {
@@ -88,4 +93,17 @@ func SetClientServerConnectionTo(ip string) (server net.Conn, client net.Conn, e
 		}
 	}
 	return server, client, nil
+}
+func GetLocalIp04() (string, error) {
+	host, err := os.Hostname()
+	if err != nil {
+		return "", err
+	}
+	addrs, err := net.LookupIP(host)
+	if err != nil {
+		return "", err
+	}
+	ip4 := addrs[len(addrs)-1]
+
+	return ip4.To4().String(), nil
 }

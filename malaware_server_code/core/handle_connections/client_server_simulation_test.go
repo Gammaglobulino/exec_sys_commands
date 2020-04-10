@@ -1,7 +1,6 @@
 package handle_connections
 
 import (
-	"../../../Execute_systems_commands"
 	"../handle_connections"
 	"encoding/gob"
 	"github.com/stretchr/testify/assert"
@@ -16,7 +15,7 @@ type Data struct {
 }
 
 func TestClientServerCommunicationLab(t *testing.T) {
-	localip, err := Execute_systems_commands.RetrieveCurrentIP()
+	localip, err := handle_connections.GetLocalIp04()
 	assert.Nil(t, err)
 	localip = localip + handle_connections.Port
 	serverconn, clientconn, err := handle_connections.SetClientServerConnectionTo(localip)
@@ -28,14 +27,22 @@ func TestClientServerCommunicationLab(t *testing.T) {
 }
 
 func TestClientServerCommunicationNotValidIp(t *testing.T) {
-	localip := "1.1.1.1:111"
+	localip := "0.0.0.0:0"
 	_, _, err := handle_connections.SetClientServerConnectionTo(localip)
 	assert.NotNil(t, err)
+
+}
+
+func TestGetLocalIp04(t *testing.T) {
+	localip, err := handle_connections.GetLocalIp04()
+	assert.Nil(t, err)
+	assert.Contains(t, localip, "")
 }
 
 func TestSendStreamedDatatoClient(t *testing.T) {
-	localip, err := Execute_systems_commands.RetrieveCurrentIP()
+	localip, err := handle_connections.GetLocalIp04()
 	assert.Nil(t, err)
+	assert.Contains(t, localip, "")
 	localip = localip + handle_connections.Port
 	serverconn, clientconn, err := handle_connections.SetClientServerConnectionTo(localip)
 	assert.Nil(t, err)
@@ -55,7 +62,9 @@ func TestSendGobDataOverTheWire(t *testing.T) {
 	var clientconn net.Conn
 
 	t.Run("Test Client/Server connection", func(t *testing.T) {
-		localip, err := Execute_systems_commands.RetrieveCurrentIP()
+		localip, err := handle_connections.GetLocalIp04()
+		assert.Nil(t, err)
+		assert.Contains(t, localip, "")
 		assert.Nil(t, err)
 		localip = localip + handle_connections.Port
 		serverconn, clientconn, err = handle_connections.SetClientServerConnectionTo(localip)

@@ -5,14 +5,8 @@ import (
 	"net"
 )
 
-const (
-	ServerIP = "10.0.2.15"
-	Port     = ":9090"
-)
-
 func ConnectTo(ip string) (net.Conn, error) {
-	LocalIPAddr := ServerIP + Port
-	connection, err := net.Dial("tcp", LocalIPAddr)
+	connection, err := net.Dial("tcp", ip)
 	if err != nil {
 		return nil, err
 	}

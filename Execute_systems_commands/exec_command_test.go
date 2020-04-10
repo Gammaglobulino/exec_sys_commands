@@ -6,6 +6,8 @@ package Execute_systems_commands
 import (
 	"../Execute_systems_commands"
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"os/exec"
 	"strings"
 	"testing"
 )
@@ -21,6 +23,12 @@ func TestExecuteSystemCommandWithFunc(t *testing.T) {
 		t.Fatalf("Output string should contain <LOOPBACK,UP,LOWER_UP>, actual %s", result)
 	}
 
+}
+func TestExecuteSystemCommandOnWindows(t *testing.T) {
+	cmd := exec.Command("cmd", "/c", "ipconfig")
+	out, err := cmd.CombinedOutput()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, out)
 }
 
 func TestCommand_Execute_RetrieveETH0StringIndexinterface(t *testing.T) {
@@ -77,16 +85,6 @@ func TestRetrieveIPaddr(t *testing.T) {
 	IP = strings.Split(IP, "/")[0]
 	if IP == "" {
 		t.Fatal("Invalid IP or not present")
-	}
-}
-
-func TestRetrieveCurrentIP(t *testing.T) {
-	ip, err := Execute_systems_commands.RetrieveCurrentIP()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if ip == "" {
-		t.Fatal("Invalid ip address or not present")
 	}
 }
 

@@ -65,27 +65,3 @@ func InterfaceExists(iface string) (error, bool, int) {
 	}
 	return nil, isthere, index
 }
-func RetrieveCurrentIP() (string, error) {
-	out, err := ExecuteSystemCommand("ip", []string{"a"})
-	if err != nil {
-		return "", err
-	}
-	outputCommands := strings.Split(out, " ")
-	var index int
-	for i, v := range outputCommands {
-		if v == "eth0:" {
-			index = i
-			break
-		}
-	}
-	IP := ""
-	NextEth0 := outputCommands[index:]
-	for i, v := range NextEth0 {
-		if v == "inet" {
-			IP = strings.Split(NextEth0[i+1], "/")[0]
-		}
-	}
-
-	return IP, nil
-
-}

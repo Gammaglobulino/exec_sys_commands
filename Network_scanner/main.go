@@ -9,10 +9,9 @@ import (
 )
 
 func main() {
-	targetIP := "192.168.1.1/24"
+	targetIP := "192.168.1.1"
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-
 	scanner, err := nmap.NewScanner(
 		nmap.WithTargets(targetIP),
 		nmap.WithPorts("80,443", "999"),
