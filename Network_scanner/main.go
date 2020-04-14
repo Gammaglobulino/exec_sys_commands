@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	targetIP := "192.168.33.113"
+	targetIP := "172.17.147.241"
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	scanner, err := nmap.NewScanner(

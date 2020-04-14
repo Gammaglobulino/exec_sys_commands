@@ -6,13 +6,14 @@ import (
 	"github.com/google/gopacket/pcap"
 	"log"
 	"strings"
+	"time"
 )
 
 var (
 	iface    = `\Device\NPF_{74F64D39-4E0C-40D4-B041-B17D82CF0536}`
 	DevFound = false
-	SnapLen  = int32(1600)
-	Timeout  = pcap.BlockForever
+	SnapLen  = int32(65535)
+	Timeout  = -1 * time.Second
 	Filter   = "tcp and port 80"
 	Promisc  = false
 )

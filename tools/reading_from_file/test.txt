@@ -1,0 +1,1 @@
+ABC <- scritti prima da bufio.Write(byte[])
