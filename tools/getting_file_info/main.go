@@ -14,4 +14,8 @@ func main() {
 	fmt.Println("File name:", fileInfo.Name())
 	fmt.Println("File size:", fileInfo.Size())
 	fmt.Println("File permissions:", fileInfo.Mode())
+	fmt.Println("Last modified:", fileInfo.ModTime())
+	fmt.Println("Is directory:", fileInfo.IsDir())
+	fmt.Println("System Interface:", fileInfo.Sys())
+
 }

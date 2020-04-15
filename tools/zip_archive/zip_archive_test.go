@@ -15,9 +15,9 @@ var filesToArchive = []struct{ Name, Data string }{
 	{"test2.txt", "\x65\x66\x67"},
 }
 
-func TestZippingAndExtractingfiles(t *testing.T) {
+func TestAddingandExtractingfilesToZipArchiveFiles(t *testing.T) {
 
-	//Zip files
+	//Adding files to a zip Archive
 	outFile, err := os.Create("test.zip")
 	assert.Nil(t, err)
 	defer outFile.Close()
