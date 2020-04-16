@@ -127,7 +127,7 @@ func TestRetrieveLocalNetworkDevice(t *testing.T) {
 }
 
 func TestGetLocalInterfaceIP4FromName(t *testing.T) {
-	ip, err := net_packet_capturing.GetLocalInterfaceIP4FromName("Wi-Fi")
+	ip, err := net_packet_capturing.GetLocalInterfaceIP4FromName("vEthernet")
 	assert.Nil(t, err)
 	log.Println(ip)
 
@@ -210,6 +210,27 @@ func TestGetOnePacketFromEthernetDevice(t *testing.T) {
 
 	fmt.Println(packet)
 }
+func TestDetectingPacketLayers(t *testing.T) {
+	deviceName, err := net_packet_capturing.GetDeviceNameFromInterface("Wi-Fi")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, deviceName)
+	log.Println(deviceName)
+	// Open Device
+	handle, err := pcap.OpenLive(deviceName, net_packet_capturing.SnapLen, net_packet_capturing.Promisc, net_packet_capturing.Timeout)
+	if err != nil {
+		log.Fatal("OpenLive Call: ", err)
+	}
+	var filter = "TCP and port 80"
+	handle.SetBPFFilter(filter)
+	defer handle.Close()
+	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+	for packet := range packetSource.Packets() {
+		net_packet_capturing.PrintPacketInfo(packet)
+		net_packet_capturing.FindPayloadStringMatchFor("Pandora", packet, false)
+	}
+
+}
+
 func TestSamplePacketsFromDevice(t *testing.T) {
 	deviceName, err := net_packet_capturing.GetDeviceNameFromInterface("Wi-Fi")
 	assert.Nil(t, err)
