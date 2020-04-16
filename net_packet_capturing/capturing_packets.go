@@ -2,15 +2,14 @@ package net_packet_capturing
 
 import (
 	"fmt"
-	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"log"
+	"net"
 	"strings"
 	"time"
 )
 
 var (
-	iface    = `\Device\NPF_{74F64D39-4E0C-40D4-B041-B17D82CF0536}`
 	DevFound = false
 	SnapLen  = int32(65535)
 	Timeout  = -1 * time.Second
@@ -18,42 +17,51 @@ var (
 	Promisc  = false
 )
 
-func ListenToTCPPackets() {
+func GetLocalInterfaceIP4FromName(inface string) (string, error) {
+	device, err := net.InterfaceByName(inface)
+	if err != nil {
+		return "", err
+	}
+	addrs, err := device.Addrs()
+	if err != nil {
+		return "", err
+	}
+	ip4Name := strings.Split(addrs[1].String(), "/")[0]
+	return ip4Name, nil
+}
 
-	// you must have permission to capture packet- try using sudo su
-	//trying entering username and password to http://diptera.myspecies.info/
+type deviceNotFoundErr struct {
+	Message string
+}
 
-	for {
+func (de *deviceNotFoundErr) Error() string {
+	return de.Message
+}
 
-		handle, err := pcap.OpenLive(iface, SnapLen, Promisc, Timeout)
-		if err != nil {
-			log.Panic(err)
-		}
+func GetDeviceNameFromInterface(inface string) (string, error) {
 
-		err = handle.SetBPFFilter(Filter)
-		if err != nil {
-			log.Panicln(err)
-		}
+	ip, err := GetLocalInterfaceIP4FromName(inface)
 
-		src := gopacket.NewPacketSource(handle, handle.LinkType())
-		search_array := []string{"name", "username", "pass"}
-
-		for pkt := range src.Packets() {
-			applayer := pkt.ApplicationLayer()
-			if applayer == nil {
-				continue
-			}
-			payload := applayer.Payload()
-			for _, s := range search_array {
-				index := strings.Index(string(payload), s)
-				if index != -1 {
-					fmt.Println(string(payload[index : index+100]))
-				}
-
-			}
-		}
-		handle.Close()
-
+	if err != nil {
+		return "", err
 	}
 
+	devices, err := pcap.FindAllDevs()
+	if err != nil {
+		return "", err
+	}
+	var deviceName string
+	for _, dev := range devices {
+		for _, addrs := range dev.Addresses {
+			if addrs.IP.String() == ip {
+				deviceName = dev.Name
+			}
+		}
+	}
+	if deviceName == "" {
+		error := &deviceNotFoundErr{fmt.Sprintf("Device:%s not found \n", inface)}
+		return "", error
+	}
+	log.Println(deviceName)
+	return deviceName, nil
 }
