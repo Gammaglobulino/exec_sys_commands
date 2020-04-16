@@ -13,7 +13,7 @@ type FileNode struct {
 	Info     os.FileInfo
 }
 
-func InsertSortedNodeWithLambdas(fileList *list.List, fileNode FileNode, sorting func(a, b FileNode) bool) {
+func InsertSortedNodeWithSortingLambda(fileList *list.List, fileNode FileNode, sorting func(a, b FileNode) bool) {
 	if fileList.Len() == 0 {
 		fileList.PushFront(fileNode)
 		return
@@ -41,7 +41,7 @@ func InsertSortedNodeInfo(fileList *list.List, fileNode FileNode) {
 	fileList.PushBack(fileNode)
 }
 
-func GetFilesInDirBySize(fileList *list.List, path string) {
+func GetFiles(fileList *list.List, path string) {
 	dirFiles, err := ioutil.ReadDir(path)
 	if err != nil {
 		log.Fatal(err)
@@ -50,7 +50,7 @@ func GetFilesInDirBySize(fileList *list.List, path string) {
 		if file.IsDir() {
 			fullPath := filepath.Join(path, file.Name())
 			//fmt.Printf("[dir %s]: %s\n",fullPath,file.Name())
-			GetFilesInDirBySize(fileList, fullPath)
+			GetFiles(fileList, fullPath)
 		} else {
 			//fmt.Println("[file]", file.Name())
 			fullPath := filepath.Join(path, file.Name())
@@ -58,6 +58,28 @@ func GetFilesInDirBySize(fileList *list.List, path string) {
 				FullPath: fullPath,
 				Info:     file,
 			})
+
+		}
+	}
+}
+
+func GetFilesWithLambdas(fileList *list.List, path string, sorting func(a, b FileNode) bool) {
+	dirFiles, err := ioutil.ReadDir(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, file := range dirFiles {
+		if file.IsDir() {
+			fullPath := filepath.Join(path, file.Name())
+			//fmt.Printf("[dir %s]: %s\n",fullPath,file.Name())
+			GetFiles(fileList, fullPath)
+		} else {
+			//fmt.Println("[file]", file.Name())
+			fullPath := filepath.Join(path, file.Name())
+			InsertSortedNodeWithSortingLambda(fileList, FileNode{
+				FullPath: fullPath,
+				Info:     file,
+			}, sorting)
 
 		}
 	}

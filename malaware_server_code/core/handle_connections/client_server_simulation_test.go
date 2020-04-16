@@ -4,6 +4,7 @@ import (
 	"../handle_connections"
 	"encoding/gob"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"net"
 	"testing"
 )
@@ -37,6 +38,7 @@ func TestGetLocalIp04(t *testing.T) {
 	localip, err := handle_connections.GetLocalIp04()
 	assert.Nil(t, err)
 	assert.Contains(t, localip, "")
+	log.Println(localip)
 }
 
 func TestSendStreamedDatatoClient(t *testing.T) {

@@ -24,7 +24,6 @@ func TestBufferedBytesToFile(t *testing.T) {
 		}
 	}
 	file.Close()
-
 	file, err = os.OpenFile("test.txt", os.O_WRONLY, 0666)
 	assert.Nil(t, err)
 	assert.NotNil(t, file)

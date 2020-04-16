@@ -21,7 +21,7 @@ func TestGetDir(t *testing.T) {
 	assert.NotEmpty(t, dirFiles)
 
 }
-func TestAddNodeToList(t *testing.T) {
+func TestAddInfoNodeFileToList(t *testing.T) {
 	path := "c:\\go"
 	dirFiles, err := ioutil.ReadDir(path)
 	fileList := list.List{}
@@ -53,10 +53,10 @@ func TestAddNodeToList(t *testing.T) {
 	}
 }
 
-func TestGetFilesInDirBySizeFirtDirLEvel(t *testing.T) {
+func TestGetFilesInDirBySizeNoRecursive(t *testing.T) {
 	path := "c:\\go"
 	fileList := list.List{}
-	find_largest_files_on_dir.GetFilesInDirBySize(&fileList, path)
+	find_largest_files_on_dir.GetFiles(&fileList, path)
 	assert.NotEmpty(t, fileList)
 	for element := fileList.Front(); element != nil; element = element.Next() {
 
@@ -68,7 +68,7 @@ func TestGetFilesInDirBySizeFirtDirLEvel(t *testing.T) {
 	}
 }
 
-func TestAddNodeWithLambdasSortingByFileSize(t *testing.T) {
+func TestAddingNodeWithSortingByFileSizeLambda(t *testing.T) {
 	path := "c:\\go"
 	dirFiles, err := ioutil.ReadDir(path)
 	fileList := list.List{}
@@ -90,7 +90,7 @@ func TestAddNodeWithLambdasSortingByFileSize(t *testing.T) {
 		} else {
 			fmt.Println("[file]", file.Name())
 			fullPath := filepath.Join(path, file.Name())
-			find_largest_files_on_dir.InsertSortedNodeWithLambdas(&fileList, find_largest_files_on_dir.FileNode{
+			find_largest_files_on_dir.InsertSortedNodeWithSortingLambda(&fileList, find_largest_files_on_dir.FileNode{
 				FullPath: fullPath,
 				Info:     file,
 			}, sortingFunction)
@@ -107,7 +107,7 @@ func TestAddNodeWithLambdasSortingByFileSize(t *testing.T) {
 	}
 }
 
-func TestAddNodeWithLambdasSortingByModifiedDate(t *testing.T) {
+func TestAddingNodeWithSortingByModifiedDateLambda(t *testing.T) {
 	path := "c:\\go"
 	dirFiles, err := ioutil.ReadDir(path)
 	fileList := list.List{}
@@ -129,13 +129,34 @@ func TestAddNodeWithLambdasSortingByModifiedDate(t *testing.T) {
 		} else {
 			fmt.Println("[file]", file.Name())
 			fullPath := filepath.Join(path, file.Name())
-			find_largest_files_on_dir.InsertSortedNodeWithLambdas(&fileList, find_largest_files_on_dir.FileNode{
+			find_largest_files_on_dir.InsertSortedNodeWithSortingLambda(&fileList, find_largest_files_on_dir.FileNode{
 				FullPath: fullPath,
 				Info:     file,
 			}, sortingFunction)
 
 		}
 	}
+	assert.NotEmpty(t, fileList)
+	for element := fileList.Front(); element != nil; element = element.Next() {
+
+		fileName := element.Value.(find_largest_files_on_dir.FileNode).Info.Name()
+		fileSize := element.Value.(find_largest_files_on_dir.FileNode).Info.Size()
+		fileDate := element.Value.(find_largest_files_on_dir.FileNode).Info.ModTime()
+
+		fmt.Printf("file: %s size:%v last modified:%s\n", fileName, fileSize, fileDate)
+	}
+}
+
+func TestGetFilesWithLambdas(t *testing.T) {
+	fileList := list.List{}
+	path := "D:\\World of Warcraft"
+	sortByModifiedDate := func(a, b find_largest_files_on_dir.FileNode) bool {
+		if a.Info.ModTime().Before(b.Info.ModTime()) {
+			return true
+		}
+		return false
+	}
+	find_largest_files_on_dir.GetFilesWithLambdas(&fileList, path, sortByModifiedDate)
 	assert.NotEmpty(t, fileList)
 	for element := fileList.Front(); element != nil; element = element.Next() {
 
