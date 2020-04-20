@@ -8,7 +8,7 @@ import (
 )
 
 func TestMXRecordsLookup(t *testing.T) {
-	DNS := "google.com"
+	DNS := "msn.com"
 	mxRecords, err := net.LookupMX(DNS)
 	assert.Nil(t, err)
 	for _, mxRecord := range mxRecords {

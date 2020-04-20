@@ -9,7 +9,7 @@ import (
 )
 
 func TestDetectingHostnameFromIP(t *testing.T) {
-	localip, err := handle_connections.GetLocalIp04()
+	localip, err := handle_connections.GetLocalIp04Str()
 	assert.Nil(t, err)
 	log.Println(localip)
 	ip := net.ParseIP(localip)
@@ -23,7 +23,7 @@ func TestDetectingHostnameFromIP(t *testing.T) {
 }
 
 func TestDetectingIPsfromHostname(t *testing.T) {
-	localip, err := handle_connections.GetLocalIp04()
+	localip, err := handle_connections.GetLocalIp04Str()
 	assert.Nil(t, err)
 	log.Println(localip)
 	ip := net.ParseIP(localip)

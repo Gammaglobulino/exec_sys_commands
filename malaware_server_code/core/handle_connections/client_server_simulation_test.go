@@ -16,7 +16,7 @@ type Data struct {
 }
 
 func TestClientServerCommunicationLab(t *testing.T) {
-	localip, err := handle_connections.GetLocalIp04()
+	localip, err := handle_connections.GetLocalIp04Str()
 	assert.Nil(t, err)
 	localip = localip + handle_connections.Port
 	serverconn, clientconn, err := handle_connections.SetClientServerConnectionTo(localip)
@@ -35,14 +35,14 @@ func TestClientServerCommunicationNotValidIp(t *testing.T) {
 }
 
 func TestGetLocalIp04(t *testing.T) {
-	localip, err := handle_connections.GetLocalIp04()
+	localip, err := handle_connections.GetLocalIp04Str()
 	assert.Nil(t, err)
 	assert.Contains(t, localip, "")
 	log.Println(localip)
 }
 
 func TestSendStreamedDatatoClient(t *testing.T) {
-	localip, err := handle_connections.GetLocalIp04()
+	localip, err := handle_connections.GetLocalIp04Str()
 	assert.Nil(t, err)
 	assert.Contains(t, localip, "")
 	localip = localip + handle_connections.Port
@@ -64,7 +64,7 @@ func TestSendGobDataOverTheWire(t *testing.T) {
 	var clientconn net.Conn
 
 	t.Run("Test Client/Server connection", func(t *testing.T) {
-		localip, err := handle_connections.GetLocalIp04()
+		localip, err := handle_connections.GetLocalIp04Str()
 		assert.Nil(t, err)
 		assert.Contains(t, localip, "")
 		assert.Nil(t, err)

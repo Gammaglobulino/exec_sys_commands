@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+	"io/ioutil"
 	"os"
 )
 
@@ -54,4 +55,36 @@ func SavePemToFile(pemBlock *pem.Block, filename string) error {
 		return err
 	}
 	return nil
+}
+
+func LoadPrivateKFromPEMFile(pkFileName string) (*rsa.PrivateKey, error) {
+	fileData, err := ioutil.ReadFile(pkFileName)
+	if err != nil {
+		return nil, err
+	}
+	block, _ := pem.Decode(fileData)
+	if block == nil || block.Type != "RSA PRIVATE KEY" {
+		return nil, errors.New("Unable load the Private Key from the PEM file")
+	}
+	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	return privateKey, nil
+}
+
+func LoadPublicKFromPEMFile(pkFileName string) (*rsa.PublicKey, error) {
+	fileData, err := ioutil.ReadFile(pkFileName)
+	if err != nil {
+		return nil, err
+	}
+	block, _ := pem.Decode(fileData)
+	if block == nil || block.Type != "PUBLIC KEY" {
+		return nil, errors.New("Unable load the public Key from the PEM file")
+	}
+	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	return publicKey.(*rsa.PublicKey), nil
 }

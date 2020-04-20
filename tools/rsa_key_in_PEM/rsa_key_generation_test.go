@@ -66,3 +66,9 @@ func TestSavePemToFile(t *testing.T) {
 	assert.Nil(t, err)
 
 }
+func TestLoadPKFromPEMFile(t *testing.T) {
+	privateKey, err := rsa_key_in_PEM.LoadPrivateKFromPEMFile("privatePEM")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, privateKey)
+	log.Println(privateKey)
+}

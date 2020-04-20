@@ -94,7 +94,7 @@ func SetClientServerConnectionTo(ip string) (server net.Conn, client net.Conn, e
 	}
 	return server, client, nil
 }
-func GetLocalIp04() (string, error) {
+func GetLocalIp04Str() (string, error) {
 	host, err := os.Hostname()
 	if err != nil {
 		return "", err
@@ -106,4 +106,18 @@ func GetLocalIp04() (string, error) {
 	ip4 := addrs[len(addrs)-1]
 
 	return ip4.To4().String(), nil
+}
+
+func GetLocalIp04() (net.IP, error) {
+	host, err := os.Hostname()
+	if err != nil {
+		return net.IP{}, err
+	}
+	addrs, err := net.LookupIP(host)
+	if err != nil {
+		return net.IP{}, err
+	}
+	ip4 := addrs[len(addrs)-1]
+
+	return ip4.To4(), nil
 }
