@@ -5,7 +5,6 @@ import (
 	"../sending_command_loop"
 	"encoding/gob"
 	"fmt"
-	"github.com/hprose/hprose-go"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net"
@@ -39,33 +38,6 @@ func TestCommandPipe_AddCommand(t *testing.T) {
 	pipe.AddCommand(*printHello).AddCommand(*execDir)
 	assert.EqualValues(t, "Print Hello", pipe.Pipe[0].Name)
 	pipe.Execute()
-}
-
-func TestCompexDataSerialization(t *testing.T) {
-	//not working, func cannot be serialized
-	command := func() (string, error) {
-		println("Hello world")
-		return "ok", nil
-	}
-	printHello := sending_command_loop.NewCommand("Print Hello", command)
-
-	command = func() (string, error) {
-		fmt.Println("Exec dir")
-		return "ok", nil
-	}
-	execDir := sending_command_loop.NewCommand("Exec dir", command)
-
-	pipe := &sending_command_loop.CommandPipe{}
-	pipe.AddCommand(*printHello).AddCommand(*execDir)
-	piped := &sending_command_loop.CommandPipe{}
-
-	serializedPipe, err := hprose.Serialize(pipe, true)
-	assert.Nil(t, err)
-	log.Println(serializedPipe)
-	err = hprose.Unserialize(serializedPipe, piped, true)
-	assert.Nil(t, err)
-	log.Println(piped)
-
 }
 
 func TestRemoteCommand_Execute(t *testing.T) {
