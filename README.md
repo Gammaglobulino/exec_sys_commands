@@ -1,4 +1,4 @@
-# Digital forensic in Go
+# Digital Forensic in Go
 Think Go is one of the best language for playing the "Defensive Coding" style, if you know what to do of course. 
 Here you can find my 20 yrs experience on System Programming, Defensive Coding and Digital Forensic.
 The tools folder is where you can find the most useful code: 
