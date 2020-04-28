@@ -1,7 +1,7 @@
 package main
 
 import (
-	"../../malaware_server_code/core/handle_connections"
+	"../../client_server_connection/core/handle_connections"
 	"../tls_server"
 	"github.com/stretchr/testify/assert"
 	"testing"

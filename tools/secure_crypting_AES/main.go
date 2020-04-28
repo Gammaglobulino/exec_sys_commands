@@ -4,18 +4,20 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base64"
 	"io"
 	"io/ioutil"
 	"log"
 )
 
-func GeneratePrimaryKey() ([]byte, error) {
+func GeneratePrimaryKey() (string, error) {
 	randomBytes := make([]byte, 32)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
-		return nil, nil
+		return "", nil
 	}
-	return randomBytes, nil
+	pk := base64.URLEncoding.EncodeToString(randomBytes)
+	return pk, nil
 }
 
 func AESCryptFromToFile(key []byte, fromSourceFile string, toDestinationFileName string) error {

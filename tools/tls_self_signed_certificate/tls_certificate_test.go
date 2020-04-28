@@ -1,7 +1,7 @@
 package tls_self_signed_certificate
 
 import (
-	"../../malaware_server_code/core/handle_connections"
+	"../../client_server_connection/core/handle_connections"
 	"../rsa_key_in_PEM"
 	"../tls_self_signed_certificate"
 	"crypto/rand"

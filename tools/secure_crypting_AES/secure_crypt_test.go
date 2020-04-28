@@ -5,6 +5,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base64"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"io/ioutil"
@@ -17,7 +18,9 @@ func TestGeneratePrimaryKey(t *testing.T) {
 	numBytesRead, err := rand.Read(randomBytes)
 	assert.Nil(t, err)
 	assert.EqualValues(t, 32, numBytesRead)
-	log.Println(randomBytes)
+	pk := base64.URLEncoding.EncodeToString(randomBytes)
+	log.Println(pk)
+
 }
 
 func TestStoreKeytoFileAndVerify(t *testing.T) {
