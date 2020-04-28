@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net"
+	"os"
 	"testing"
 )
 
@@ -231,5 +232,12 @@ func TestSendingCommandTo(t *testing.T) {
 	assert.NotNil(t, clientConn)
 	defer clientConn.Close()
 	defer serverConn.Close()
+}
 
+func TestFileSystemNavigationCommandPipe(t *testing.T) {
+	workingDir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(workingDir)
 }

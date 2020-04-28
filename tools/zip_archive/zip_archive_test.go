@@ -1,9 +1,11 @@
 package zip_archive
 
 import (
+	"../zip_archive"
 	"archive/zip"
 	"github.com/stretchr/testify/assert"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -13,6 +15,31 @@ import (
 var filesToArchive = []struct{ Name, Data string }{
 	{"test.txt", "String content for text 1"},
 	{"test2.txt", "\x65\x66\x67"},
+}
+
+func TestZipBytesToFile(t *testing.T) {
+	bytesToZip, err := ioutil.ReadFile("CV_Mazzanti Andrea.doc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	nbytes, err := zip_archive.ZipBytesTo("test.zip", "AM.doc", bytesToZip)
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Printf("Zipped %v bytes ", nbytes)
+}
+func TestUnzipBytesOriginalTo(t *testing.T) {
+	err := zip_archive.UnzipBytesTo("", "test.zip")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUnzipToDifferentFileName(t *testing.T) {
+	err := zip_archive.UnzipBytesTo("AndreaMazzanti.doc", "test.zip")
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestAddingandExtractingfilesToZipArchiveFiles(t *testing.T) {
