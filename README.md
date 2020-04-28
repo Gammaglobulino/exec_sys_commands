@@ -5,4 +5,7 @@ The tools folder is where you can find the most useful code:
 Hashing, Cripting, TLS tunneling, SHA2 and more.
 There's also the "Malevolent" code on the Malaware section, this is for you to understand how the "Bad Guys" craft their worms,
 so have an understand on how you can protect from them. You're not supposed to use the code as template for your own experimentation, at least do it on your own machine, using a virtualization tool.
+All the code is TDD and first, not all the code is refactored and live their lives inside the test, you can refactor it as an exercise as you wish.
+Most of the code is GOFed (mostly Factories,Builder and Chain of command) but not all.
+
 Hope you enjoy it.
