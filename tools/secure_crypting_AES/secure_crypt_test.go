@@ -27,7 +27,7 @@ func TestStoreKeytoFileAndVerify(t *testing.T) {
 	filename := "key.bin"
 	pk, err := secure_crypting_AES.GeneratePrimaryKey()
 	assert.Nil(t, err)
-	err = ioutil.WriteFile(filename, pk, 0666)
+	err = ioutil.WriteFile(filename, []byte(pk), 0666)
 	assert.Nil(t, err)
 	readData, err := ioutil.ReadFile("key.bin")
 	assert.Nil(t, err)
@@ -36,14 +36,20 @@ func TestStoreKeytoFileAndVerify(t *testing.T) {
 
 func TestAESCrypt(t *testing.T) {
 	//load the primary key
-	readFileToEncrypt, err := ioutil.ReadFile("commedia_canto_primo")
-	assert.Nil(t, err)
+	readFileToEncrypt, err := ioutil.ReadFile("mutuo_peschiera_casa.pdf")
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	readPK, err := ioutil.ReadFile("key.bin")
-	assert.Nil(t, err)
+	readPK, err := ioutil.ReadFile("amkey.key")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	block, err := aes.NewCipher(readPK)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cipherTxt := make([]byte, aes.BlockSize+len(readFileToEncrypt))
 
@@ -53,21 +59,36 @@ func TestAESCrypt(t *testing.T) {
 	cfb := cipher.NewCFBEncrypter(block, iv)
 	cfb.XORKeyStream(cipherTxt[aes.BlockSize:], readFileToEncrypt)
 
-	err = ioutil.WriteFile("encripted_comedy.dat", cipherTxt, 0666)
-	assert.Nil(t, err)
-	log.Println(string(readFileToEncrypt))
-	log.Println(string(cipherTxt))
+	err = ioutil.WriteFile("encripted_mutuo.dat", cipherTxt, 0666)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAESDecryptFromBytes(t *testing.T) {
+	key := []byte("kdjfheyrnchdtescdetfbskdiehdtass")
+	data := []byte("Testo di prova per capire se va")
+	cryptedData, err := secure_crypting_AES.AESCryptFromDataBytesToByteArray(key, data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	originalData, err := secure_crypting_AES.AESDecryptFromBytesToByteArray(key, cryptedData)
+	if err != nil {
+		t.Fatal()
+	}
+	assert.EqualValues(t, data, originalData)
+
 }
 
 func TestDecryptAESCryptedFile(t *testing.T) {
 
-	readPK, err := ioutil.ReadFile("key.bin")
+	readPK, err := ioutil.ReadFile("amkey.key")
 	assert.Nil(t, err)
 
 	block, err := aes.NewCipher(readPK)
 	assert.Nil(t, err)
 
-	cipherText, err := ioutil.ReadFile("comedycrypt.dat")
+	cipherText, err := ioutil.ReadFile("encripted_mutuo.dat")
 	assert.Nil(t, err)
 
 	iv := cipherText[:aes.BlockSize]
@@ -75,7 +96,7 @@ func TestDecryptAESCryptedFile(t *testing.T) {
 
 	cfb := cipher.NewCFBDecrypter(block, iv)
 	cfb.XORKeyStream(cipherText, cipherText)
-	log.Println(string(cipherText))
+	ioutil.WriteFile("mutuo.pdf", cipherText, 0666)
 }
 
 func TestAESCryptFromToFile(t *testing.T) {
@@ -91,5 +112,4 @@ func TestAESDecryptFromFile(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEmpty(t, data)
 	log.Println(string(data))
-
 }

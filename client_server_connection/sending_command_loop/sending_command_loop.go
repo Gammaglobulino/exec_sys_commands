@@ -1,8 +1,13 @@
 package sending_command_loop
 
 import (
+	"../../Execute_systems_commands"
+	"../../tools/secure_crypting_AES"
 	"bytes"
+	"crypto/md5"
+	"encoding/base64"
 	"errors"
+	"io/ioutil"
 	"os/exec"
 )
 
@@ -21,9 +26,49 @@ type RemoteCommand struct {
 	Args            []string
 }
 
+type DataRemoteCommand struct {
+	//A remote command with an embedded file or byte data, kind of jacket command
+	Command       RemoteCommand
+	DataSignature string
+	DataBytes     []byte
+	Filename      string
+	Crypted       bool
+}
+
+func (drc *DataRemoteCommand) Execute() (string, error) {
+	var err error
+	if drc.Crypted {
+		drc.DataBytes, err = secure_crypting_AES.AESDecryptFromBytesToByteArray([]byte(drc.DataSignature), drc.DataBytes)
+		if err != nil {
+			drc.Command.OutError = err.Error()
+			return "", err
+		}
+	}
+	ioutil.WriteFile(drc.Filename, drc.DataBytes, 0666)
+	drc.Command.Execute()
+	return "ok", nil
+}
+
+func NewAESCryptedDRC(password string, data []byte) (*DataRemoteCommand, error) {
+
+	//MD5 is not secure - but you need 32byte code for AES. MD5 plus AES is a kind of secure method.
+	drc := &DataRemoteCommand{Crypted: true}
+
+	MD5 := md5.Sum([]byte(password))
+	drc.DataSignature = base64.StdEncoding.EncodeToString(MD5[:])
+
+	var err error
+	drc.DataBytes, err = secure_crypting_AES.AESCryptFromDataBytesToByteArray([]byte(drc.DataSignature), data)
+
+	if err != nil {
+		return nil, err
+	}
+	return drc, nil
+}
+
 type CommandPipe struct {
 	Name string
-	Pipe []RemoteCommand
+	Pipe []Execute_systems_commands.Commander
 }
 
 func (rc *RemoteCommand) CmdPlusArgs() string {
@@ -46,29 +91,33 @@ func (rc *RemoteCommand) Execute() (string, error) {
 		}
 		return result, err
 	} else {
-		var cmd *exec.Cmd
-		switch rc.TargetOSMachine {
-		case win:
-			cmd = exec.Command("powershell.exe", "/C", rc.CmdPlusArgs())
-		case lin:
-			cmd = exec.Command(rc.CmdPlusArgs())
-		default:
-			return "", errors.New("OS not recognized")
+		if rc.CmdPlusArgs() != "" {
+			var cmd *exec.Cmd
+			switch rc.TargetOSMachine {
+			case win:
+				cmd = exec.Command("powershell.exe", "/C", rc.CmdPlusArgs())
+			case lin:
+				cmd = exec.Command(rc.CmdPlusArgs())
+			default:
+				return "", errors.New("OS not recognized")
+			}
+
+			cmdOut := bytes.NewBuffer(make([]byte, 0, 1024))
+			cmdErr := bytes.NewBuffer(make([]byte, 0, 1024))
+
+			cmd.Stdout = cmdOut
+			cmd.Stderr = cmdErr
+
+			err := cmd.Run()
+			if err != nil {
+				return "", err
+			}
+			rc.CommandOutput = cmdOut.String()
+			rc.OutError = cmdErr.String()
+			return rc.CommandOutput, nil
+		} else {
+			return "", nil
 		}
-
-		cmdOut := bytes.NewBuffer(make([]byte, 0, 1024))
-		cmdErr := bytes.NewBuffer(make([]byte, 0, 1024))
-
-		cmd.Stdout = cmdOut
-		cmd.Stderr = cmdErr
-
-		err := cmd.Run()
-		if err != nil {
-			return "", err
-		}
-		rc.CommandOutput = cmdOut.String()
-		rc.OutError = cmdErr.String()
-		return rc.CommandOutput, nil
 
 	}
 }
@@ -79,7 +128,7 @@ func (p *CommandPipe) Execute() (string, error) {
 	return "ok", nil
 }
 
-func (p *CommandPipe) AddCommand(command RemoteCommand) *CommandPipe {
+func (p *CommandPipe) AddCommand(command Execute_systems_commands.Commander) *CommandPipe {
 	p.Pipe = append(p.Pipe, command)
 	return p
 }
@@ -90,8 +139,8 @@ func NewCommand(commandName string, f func() (string, error)) *RemoteCommand {
 		CodeToExecute: f,
 	}
 }
-func NewCommandString(commandName string, commandString string, os string) RemoteCommand {
-	return RemoteCommand{
+func NewCommandString(commandName string, commandString string, os string) Execute_systems_commands.Commander {
+	return &RemoteCommand{
 		Name:            commandName,
 		CodeToExecute:   nil,
 		CommandString:   commandString,

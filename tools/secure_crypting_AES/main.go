@@ -49,6 +49,23 @@ func AESCryptFromToFile(key []byte, fromSourceFile string, toDestinationFileName
 	return nil
 }
 
+func AESCryptFromDataBytesToByteArray(key []byte, bytesIn []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	cipherTxt := make([]byte, aes.BlockSize+len(bytesIn))
+	iv := cipherTxt[:aes.BlockSize]
+
+	_, err = io.ReadFull(rand.Reader, iv) //generate random iv
+	if err != nil {
+		return nil, err
+	}
+	cfb := cipher.NewCFBEncrypter(block, iv)
+	cfb.XORKeyStream(cipherTxt[aes.BlockSize:], bytesIn)
+	return cipherTxt, nil
+}
+
 func AESDecryptFromFile(key []byte, fromFileName string) ([]byte, error) {
 
 	block, err := aes.NewCipher(key)
@@ -57,6 +74,20 @@ func AESDecryptFromFile(key []byte, fromFileName string) ([]byte, error) {
 	}
 
 	cipherText, err := ioutil.ReadFile(fromFileName)
+	if err != nil {
+		return nil, err
+	}
+
+	iv := cipherText[:aes.BlockSize]
+	cipherText = cipherText[aes.BlockSize:]
+
+	cfb := cipher.NewCFBDecrypter(block, iv)
+	cfb.XORKeyStream(cipherText, cipherText)
+	return cipherText, nil
+}
+
+func AESDecryptFromBytesToByteArray(key []byte, cipherText []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
 	}

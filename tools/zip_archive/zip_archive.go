@@ -3,6 +3,7 @@ package zip_archive
 import (
 	"archive/zip"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -67,4 +68,25 @@ func UnzipBytesTo(destinationFilename string, fromZipFile string) error {
 		}
 	}
 	return nil
+}
+
+func UnzipFromFileToBytes(fromZipFile string) ([]byte, error) {
+	zipReader, err := zip.OpenReader(fromZipFile)
+	if err != nil {
+		return nil, err
+	}
+	defer zipReader.Close()
+	var bytesOut []byte
+	for _, file := range zipReader.Reader.File {
+		zippedFile, err := file.Open()
+		if err != nil {
+			return nil, err
+		}
+		defer zippedFile.Close()
+		bytesOut, err = ioutil.ReadAll(zippedFile)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return bytesOut, nil
 }

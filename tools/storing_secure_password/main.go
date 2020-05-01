@@ -9,8 +9,7 @@ import (
 	"io"
 )
 
-var secretKey = "gamminogamma" //deprecate--- must be placed to a secure place..
-var hashedPassword = "fff4f0d581e3bbcf3f8c944ba24a6932a23a0619314c63fed9ab4d482ef81411"
+var secretKey = "---" //deprecate--- must be placed to a secure place..
 
 func GenerateSalt() (string, error) {
 	randomBytes := make([]byte, 32)
