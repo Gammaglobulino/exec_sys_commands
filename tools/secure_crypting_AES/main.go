@@ -20,7 +20,7 @@ func GeneratePrimaryKey() (string, error) {
 	return pk, nil
 }
 
-func AESCryptFromToFile(key []byte, fromSourceFile string, toDestinationFileName string) error {
+func CryptFileToFile(key []byte, fromSourceFile string, toDestinationFileName string) error {
 	//load the primary key
 	readFileToEncrypt, err := ioutil.ReadFile(fromSourceFile)
 	if err != nil {
@@ -49,7 +49,7 @@ func AESCryptFromToFile(key []byte, fromSourceFile string, toDestinationFileName
 	return nil
 }
 
-func AESCryptFromDataBytesToByteArray(key []byte, bytesIn []byte) ([]byte, error) {
+func CryptBytesArrayToByteArray(key []byte, bytesIn []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func AESCryptFromDataBytesToByteArray(key []byte, bytesIn []byte) ([]byte, error
 	return cipherTxt, nil
 }
 
-func AESDecryptFromFile(key []byte, fromFileName string) ([]byte, error) {
+func DecryptFromFile(key []byte, fromFileName string) ([]byte, error) {
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -86,7 +86,7 @@ func AESDecryptFromFile(key []byte, fromFileName string) ([]byte, error) {
 	return cipherText, nil
 }
 
-func AESDecryptFromBytesToByteArray(key []byte, cipherText []byte) ([]byte, error) {
+func DecryptFromBytesToByteArray(key []byte, cipherText []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err

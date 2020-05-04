@@ -68,11 +68,11 @@ func TestAESCrypt(t *testing.T) {
 func TestAESDecryptFromBytes(t *testing.T) {
 	key := []byte("kdjfheyrnchdtescdetfbskdiehdtass")
 	data := []byte("Testo di prova per capire se va")
-	cryptedData, err := secure_crypting_AES.AESCryptFromDataBytesToByteArray(key, data)
+	cryptedData, err := secure_crypting_AES.CryptBytesArrayToByteArray(key, data)
 	if err != nil {
 		t.Fatal(err)
 	}
-	originalData, err := secure_crypting_AES.AESDecryptFromBytesToByteArray(key, cryptedData)
+	originalData, err := secure_crypting_AES.DecryptFromBytesToByteArray(key, cryptedData)
 	if err != nil {
 		t.Fatal()
 	}
@@ -102,13 +102,13 @@ func TestDecryptAESCryptedFile(t *testing.T) {
 func TestAESCryptFromToFile(t *testing.T) {
 	readPK, err := ioutil.ReadFile("key.bin")
 	assert.Nil(t, err)
-	err = secure_crypting_AES.AESCryptFromToFile(readPK, "commedia_canto_primo", "comedycrypt.dat")
+	err = secure_crypting_AES.CryptFileToFile(readPK, "commedia_canto_primo", "comedycrypt.dat")
 	assert.Nil(t, err)
 }
 func TestAESDecryptFromFile(t *testing.T) {
 	readPK, err := ioutil.ReadFile("key.bin")
 	assert.Nil(t, err)
-	data, err := secure_crypting_AES.AESDecryptFromFile(readPK, "comedycrypt.dat")
+	data, err := secure_crypting_AES.DecryptFromFile(readPK, "comedycrypt.dat")
 	assert.Nil(t, err)
 	assert.NotEmpty(t, data)
 	log.Println(string(data))

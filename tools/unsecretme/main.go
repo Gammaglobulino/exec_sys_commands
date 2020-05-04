@@ -38,7 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	decryptedData, err := secure_crypting_AES.AESDecryptFromBytesToByteArray([]byte(pkey), cryptedData)
+	decryptedData, err := secure_crypting_AES.DecryptFromBytesToByteArray([]byte(pkey), cryptedData)
 	if err != nil {
 		fmt.Println("Corrupted data")
 		os.Exit(1)
