@@ -517,6 +517,6 @@ func TestTCPSendingReceiveMultipleCommands(t *testing.T) {
 	assert.EqualValues(t, pipe.Pipe[0].(*sending_receiving_command_loop.DataRemoteCommand).DataBytes, receivingPipe.Pipe[0].(*sending_receiving_command_loop.DataRemoteCommand).DataBytes)
 	receivingPipe.Execute()
 
-	log.Println(receivingPipe.Pipe[1].(*sending_receiving_command_loop.RemoteCommand).CommandOutput)
+	log.Println(receivingPipe.Pipe[1].(*sending_receiving_command_loop.DataRemoteCommand).Command)
 
 }

@@ -8,7 +8,9 @@ import (
 	"encoding/base64"
 	"errors"
 	"io/ioutil"
+	"log"
 	"os/exec"
+	"time"
 )
 
 const (
@@ -17,13 +19,14 @@ const (
 )
 
 type RemoteCommand struct {
-	Name            string
-	CodeToExecute   func() (string, error)
-	CommandString   string
-	CommandOutput   string
-	OutError        string
-	TargetOSMachine string //"windows" or "linux"
-	Args            []string
+	Name             string
+	CodeToExecute    func() (string, error)
+	CommandString    string
+	CommandOutput    string
+	OutError         string
+	TargetOSMachine  string //"windows" or "linux"
+	Args             []string
+	ExecutionTimeout time.Duration
 }
 
 type DataRemoteCommand struct {
@@ -108,13 +111,23 @@ func (rc *RemoteCommand) Execute() (string, error) {
 			cmd.Stdout = cmdOut
 			cmd.Stderr = cmdErr
 
-			err := cmd.Run()
-			if err != nil {
-				rc.OutError = err.Error()
-				return "", err
+			finish := make(chan bool)
+			go func() {
+				err := cmd.Run()
+				if err != nil {
+					rc.OutError = err.Error()
+				}
+				rc.CommandOutput = cmdOut.String()
+				rc.OutError = cmdErr.String()
+				finish <- true
+			}()
+			log.Println("Waiting for the command to be executed")
+			select {
+			case <-time.After(rc.ExecutionTimeout):
+			case <-finish:
 			}
-			rc.CommandOutput = cmdOut.String()
-			rc.OutError = cmdErr.String()
+			log.Println("Command Executed!!!!")
+
 			return rc.CommandOutput, nil
 		} else {
 			return "", nil
@@ -124,7 +137,10 @@ func (rc *RemoteCommand) Execute() (string, error) {
 }
 func (p *CommandPipe) Execute() (string, error) {
 	for i, _ := range p.Pipe {
-		p.Pipe[i].Execute()
+		_, err := p.Pipe[i].Execute()
+		if err != nil {
+			return "", err
+		}
 	}
 	return "ok", nil
 }
@@ -142,9 +158,10 @@ func NewCommand(commandName string, f func() (string, error)) *RemoteCommand {
 }
 func NewCommandString(commandName string, commandString string, os string) Execute_systems_commands.Commander {
 	return &RemoteCommand{
-		Name:            commandName,
-		CodeToExecute:   nil,
-		CommandString:   commandString,
-		TargetOSMachine: os,
+		Name:             commandName,
+		CodeToExecute:    nil,
+		CommandString:    commandString,
+		TargetOSMachine:  os,
+		ExecutionTimeout: 1 * time.Second,
 	}
 }
