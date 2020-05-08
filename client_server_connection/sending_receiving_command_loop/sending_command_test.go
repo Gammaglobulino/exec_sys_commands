@@ -220,6 +220,16 @@ func TestRemoteCommandAddingParameters(t *testing.T) {
 	log.Println(out)
 }
 
+func TestAddWrongParam(t *testing.T) {
+	dirCommand := sending_receiving_command_loop.NewCommandString("exec dir", "dir", "windows")
+	assert.Nil(t, dirCommand.(*sending_receiving_command_loop.RemoteCommand).Args)
+	dirCommand.(*sending_receiving_command_loop.RemoteCommand).AddParam("f:/")
+	assert.EqualValues(t, 1, len(dirCommand.(*sending_receiving_command_loop.RemoteCommand).Args))
+	_, err := dirCommand.Execute()
+	assert.NotNil(t, err)
+	fmt.Println(dirCommand.(*sending_receiving_command_loop.RemoteCommand).OutError)
+}
+
 func TestBuildStringCommandPipe(t *testing.T) {
 	ipConfigCommand := sending_receiving_command_loop.NewCommandString("exec ipconfig", "ipconfig", "windows")
 	assert.NotEmpty(t, ipConfigCommand)
@@ -236,8 +246,8 @@ func TestBuildStringCommandPipe(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	log.Println(t, pipe.Pipe[0].(*sending_receiving_command_loop.RemoteCommand).CommandOutput)
-	log.Println(t, pipe.Pipe[1].(*sending_receiving_command_loop.RemoteCommand).CommandOutput)
+	log.Println(pipe.Pipe[0].(*sending_receiving_command_loop.RemoteCommand).CommandOutput)
+	log.Println(pipe.Pipe[1].(*sending_receiving_command_loop.RemoteCommand).CommandOutput)
 
 	assert.NotEmpty(t, pipe.Pipe[0].(*sending_receiving_command_loop.RemoteCommand).CommandOutput)
 	assert.NotEmpty(t, pipe.Pipe[1].(*sending_receiving_command_loop.RemoteCommand).CommandOutput)

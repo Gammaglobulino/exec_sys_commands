@@ -1,1 +1,0 @@
-C:\Users\Drako\GolandProjects\exec_sys_commands\client_server_connection\cockroachlab\node1\cockroach-temp744978755

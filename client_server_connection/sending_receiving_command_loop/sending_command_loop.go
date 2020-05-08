@@ -112,23 +112,32 @@ func (rc *RemoteCommand) Execute() (string, error) {
 			cmd.Stderr = cmdErr
 
 			finish := make(chan bool)
+			error := make(chan error)
+
 			go func() {
 				err := cmd.Run()
-				if err != nil {
-					rc.OutError = err.Error()
-				}
 				rc.CommandOutput = cmdOut.String()
 				rc.OutError = cmdErr.String()
+				if err != nil {
+					error <- err
+				}
 				finish <- true
 			}()
 			log.Println("Waiting for the command to be executed")
 			select {
 			case <-time.After(rc.ExecutionTimeout):
 			case <-finish:
+				return rc.CommandOutput, nil
+			case msg := <-error:
+				return rc.OutError, msg
 			}
 			log.Println("Command Executed!!!!")
 
+			close(error)
+			close(finish)
+
 			return rc.CommandOutput, nil
+
 		} else {
 			return "", nil
 		}
@@ -137,9 +146,9 @@ func (rc *RemoteCommand) Execute() (string, error) {
 }
 func (p *CommandPipe) Execute() (string, error) {
 	for i, _ := range p.Pipe {
-		_, err := p.Pipe[i].Execute()
+		msg, err := p.Pipe[i].Execute()
 		if err != nil {
-			return "", err
+			return msg, err
 		}
 	}
 	return "ok", nil
