@@ -22,7 +22,7 @@ func TestCreateNewServerClusterPipe(t *testing.T) {
 func TestCreateAndStartServerCluster(t *testing.T) {
 	localip, err := handle_connections.GetLocalIp04Str()
 	assert.Nil(t, err)
-	pipe := cockroachlab.CreateNewServerClusterPipe(5, localip, 26257)
+	pipe := cockroachlab.CreateNewServerClusterPipe(7, localip, 26257)
 	msg, err := pipe.Execute()
 	if err != nil {
 		log.Println(msg)
